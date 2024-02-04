@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body %}
+    <div class="row" style="margin-bottom: 50px;">
+        <div style="display: none;" id="min_size">{{min_number}}</div>
+        <div class="menu_main">
+            <div class="menu_container">
+                <div onclick="window.location.href='/main/'" class="button_div hexagon main_menu_button menuSelected">Home</div>
+                <div onclick="window.location.href='/main/about'" class="button_div hexagon main_menu_button">About IntellInspect</div>
+                <div onclick="window.location.href='/main/login'" class="button_div hexagon main_menu_button">
+                    {% if user.is_authenticated %}
+                        Logout
+                    {% else %}
+                        Login
+                    {% endif %}
+                </div>
+                <div onclick="window.location.href='/main/team'" class="button_div hexagon main_menu_button">Our Team</div>
+                <div onclick="luckyShot();" class="button_div hexagon main_menu_button">I'm feeling Lucky</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <h1>SUBMIT ASSIGNMENT</h1>
+    </div>
+    <div class="row">
+        <div id="content_row">
+            Course:
+            <br/><br/>
+            <select id="course_selection" onchange="update_course()">
+                {% if courses %}
+                    <option value="">SELECT COURSE</option>
+                {% endif %}
+                {% for course in courses %}
+                    <option value="{{course.id}}">{{course.name}}</option>
+                {% empty %}
+                    <option value="">ADD STUDENT TO AT LEAST ONE COURSE</option>
+                {% endfor %}
+            </select>
+            <br/><br/>
+        </div>
+    </div>
+    <script>
+        var currentCourse = "";
+        var currentTeacher = "";
+        var min_number = parseInt(document.getElementById("min_size").innerHTML);
+        var recorder;
+        var videos = [];
+        var q_idx = 0;
+
+        async function update_course() {
+            if (currentCourse !== "") {
+                location.reload();
+            }
+
+            var newCourse = document.getElementById('course_selection').value;
+            currentCourse = newCourse;
+
+            fetch("/main/getDetailsForCourse", {
+                method: "POST",
+                cache: "no-cache",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ "course": newCourse }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                var teachers = data['teachers'];
+                var qs = data['questions'];
+
+                if (teachers.length === 0) {
+                    alert("No teachers teach this course?! Check if you selected the right course");
+                    location.reload();
+                }
+
+                var text = `Teacher:<br/><br/><select id="teacher_selection">`;
+                for (var i = 0; i < teachers.length; i++) {
+                    text += `<option value="${teachers[i]['id']}">${teachers[i]['name']}</option>`;
+                }
+                text += `</select><br/><br/>Question:<br/><br/><select id="question_selection">`;
+                for (var i = 0; i < qs.length; i++) {
+                    text += `<option value="${qs[i]['id']}">${qs[i]['q']}</option>`;
+                }
+                text += `</select><br/><br/>Essay:<br/><br/><textarea id='essay' rows='10'></textarea><br/><br/><input onclick="start_questioning()" type="submit" value="Submit"/>`;
+                document.getElementById("content_row").innerHTML += text;
+                document.getElementById('course_selection').value = currentCourse;
+            });
+
+            return false;
+        }
+        var questions = [];
+        var essay = "";
+        var current_question = -1;
+        async function start_questioning() {
+            if (document.getElementById('course_selection').value !== "" &&
+                document.getElementById('teacher_selection').value !== "" &&
+                document.getElementById('question_selection').value !== "" &&
+                document.getElementById('essay').value !== "") {
+
+                current_question = document.getElementById('question_selection').value;
+                essay = document.getElementById('essay').value;
+                currentTeacher = document.getElementById('teacher_selection').value;
+                currentCourse = document.getElementById('course_selection').value;
+
+                fetch("/main/getEssayQuestions", {
+                    method: "POST",
+                    cache: "no-cache",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ "question": current_question, "essay": essay }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    questions = data['questions'];
+                    document.getElementById("content_row").innerHTML = "";
+
+                    navigator.mediaDevices.getUserMedia({
+                        audio: true,
+                        video: true
+                    })
+                    .then(async function (stream) {
+
+                        var questionHolder = document.createElement('span');
+                        questionHolder.id = 'question_holder';
+                        document.getElementById("content_row").appendChild(questionHolder);
+
+                        var timeRemaining = document.createElement('span');
+                        timeRemaining.id = 'timeRemaining';
+                        document.getElementById("content_row").appendChild(timeRemaining);
+
+
+                        var liveVideo = document.createElement('video');
+                        liveVideo.id = 'live';
+                        liveVideo.muted = true;
+                        liveVideo.srcObject = stream;
+                        document.getElementById("content_row").appendChild(liveVideo);
+                        liveVideo.play();
+
+                        var startButton = document.createElement('input');
+                        startButton.type = 'button';
+                        startButton.id = 'startCurrent';
+                        startButton.style.display = 'none';
+                        startButton.onclick = startQuestion;
+                        document.getElementById("content_row").appendChild(startButton);
+
+                        var stopButton = document.createElement('input');
+                        stopButton.type = 'button';
+                        stopButton.id = 'stopCurrent';
+                        stopButton.value = 'Stop current question';
+                        stopButton.onclick = stopQuestion;
+                        document.getElementById("content_row").appendChild(stopButton);
+                        
+                        var mediaRecorder = new MediaRecorder(stream, {
+                            mimeType: 'video/webm;codecs=vp9',
+                            videoBitsPerSecond: 1200000 // Set your desired bitrate here
+                        });
+
+                        recorder = RecordRTC(stream, {
+                            type: 'video',
+                            mimeType: 'video/webm',
+                            video: {
+                                width: 640,
+                                height: 480
+                            },
+                            bitsPerSecond: 1200000,
+                            disableLogs: false, // You can disable logs for cleaner console output
+                            recorderType: MediaStreamRecorder,
+                            mediaRecorder: mediaRecorder
+                        });
+
+                        // Set the bits per second directly on the MediaRecorder instance
+                        if (mediaRecorder && mediaRecorder.videoBitsPerSecond !== undefined) {
+                            mediaRecorder.videoBitsPerSecond = 1200000; // Set your desired bitrate here
+                        }
+
+                        for (var j = 10; j > 1; j--) {
+                            timeRemaining.innerHTML = `${j} seconds left`;
+                            await delay(1000);
+                        }
+                        questionHolder.innerHTML = questions[0];
+
+                        timeRemaining.innerHTML = `1 second left`;
+                        await delay(1000);
+                        timeRemaining.innerHTML = `Recording NOW`;
+
+                        startButton.click();
+                    });
+                });
+
+                return false;
+            }
+        }
+        
+        function startQuestion() {
+            document.getElementById("startCurrent").disabled = true;
+            document.getElementById("stopCurrent").disabled = false;
+
+            recorder.startRecording();
+        }
+
+        async function stopQuestion() {
+            document.getElementById("startCurrent").disabled = false;
+            document.getElementById("stopCurrent").disabled = true;
+
+            recorder.stopRecording(async function () {
+                console.log(recorder);
+                var videoBlob = recorder.getBlob();
+                var file = new File([videoBlob], `video${q_idx + 1 + min_number}.webm`, { type: 'video/webm' });
+                videos.push(file);
+
+                var questionHolder = document.getElementById('question_holder');
+                questionHolder.innerHTML = questions[++q_idx];
+
+                if (q_idx !== 5) {
+                    for (var j = 2; j > 1; j--) {
+                        document.getElementById('timeRemaining').innerHTML = `${j} seconds left`;
+                        await delay(1000);
+                    }
+
+                    document.getElementById('timeRemaining').innerHTML = `1 second left`;
+                    await delay(1000);
+                    document.getElementById('timeRemaining').innerHTML = `Recording NOW`;
+
+                    startQuestion();
+                } else {
+                    document.getElementById('startCurrent').disabled = true;
+                    questionHolder.innerHTML = "You have finished the questions. Please wait.";
+                    await delay(10000);
+
+                    var formData = new FormData();
+                    formData.append("currentCourse", currentCourse);
+                    formData.append("currentTeacher", currentTeacher);
+                    formData.append("essay", essay);
+                    formData.append("questions", JSON.stringify(questions));
+                    formData.append("prompt", current_question);
+
+                    for (let i = 0; i < videos.length; i++) {
+                        formData.append("videos", videos[i]);
+                    }
+
+                    fetch('/main/add_submission', {
+                        method: "POST",
+                        cache: "no-cache",
+                        body: formData,
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                    });
+
+                    alert("Success! Essay submitted");
+                    location.reload();
+                }
+            });
+        }
+
+
+        function delay(time) {
+            return new Promise(resolve => setTimeout(resolve, time));
+        }
+
+    </script>
+{% endblock %}

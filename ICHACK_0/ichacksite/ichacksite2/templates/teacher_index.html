@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body %}
+    <div class="row" style="margin-bottom: 50px;">
+        <div class="menu_main">
+            <div class="menu_container">
+                <div onclick="window.location.href='/main/'" class="button_div hexagon main_menu_button menuSelected">Home</div>
+                <div onclick="window.location.href='/main/about'" class="button_div hexagon main_menu_button">About IntellInspect</div>
+                <div onclick="window.location.href='/main/login'" class="button_div hexagon main_menu_button">
+                    {% if user.is_authenticated %}
+                        Logout
+                    {% else %}
+                        Login
+                    {% endif %}
+                </div>
+                <div onclick="window.location.href='/main/team'" class="button_div hexagon main_menu_button">Our Team</div>
+                <div onclick="luckyShot();" class="button_div hexagon main_menu_button">I'm feeling Lucky</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <h1>VIEW SUBMISSIONS</h1>
+    </div>
+    <div class="row">
+        <div id="content_row">
+            Course:
+            <br/><br/>
+            <select id="course_selection" onchange="update_course()">
+                {% if courses %}
+                    <option value="">SELECT COURSE</option>
+                {% endif %}
+                {% for course in courses %}
+                    <option value="{{course.id}}">{{course.name}}</option>
+                {% empty %}
+                    <option value="">ADD TEACHER TO AT LEAST ONE COURSE</option>
+                {% endfor %}
+            </select>
+            <br/><br/>
+        </div>
+    </div>
+    <script>
+        var currentCourse = "";
+        var currentQuestion = "";
+        async function update_course() {
+            if (currentCourse !== "") {
+                location.reload();
+            }
+
+            var newCourse = document.getElementById('course_selection').value;
+            currentCourse = newCourse;
+
+            fetch("/main/getQuestionsForCourse_teacher", {
+                method: "POST",
+                cache: "no-cache",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ "course": newCourse }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                var questions = data['questions'];
+
+                if (questions.length === 0) {
+                    alert("No questions for this course?! Check if you selected the right course");
+                    location.reload();
+                }
+
+                var text = `Questions:<br/><br/><select id="question_selection" onchange="update_question()"><option value="">-- SELECT A QUESTION --</option>`;
+                for (var i = 0; i < questions.length; i++) {
+                    text += `<option value="${questions[i]['id']}">${questions[i]['q']}</option>`;
+                }
+                
+                text += `</select><br/><br/>`;
+                document.getElementById("content_row").innerHTML += text;
+                document.getElementById('course_selection').value = currentCourse; 
+            });
+
+            return false;
+        }
+
+        async function update_question() {
+            if (currentQuestion !== "") {
+                location.reload();
+            }
+
+            var newQuestion = document.getElementById('question_selection').value;
+            currentQuestion = newQuestion;
+
+            fetch("/main/getSubmissionsForQuestion_teacher", {
+                method: "POST",
+                cache: "no-cache",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ "question": currentQuestion }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                var submissions = data['submissions'];
+
+                if (submissions.length === 0) {
+                    alert("No students have answered this question! Tell them to stop being lazy about it.");
+                    location.reload();
+                }
+
+                var text = "";
+                for (var i = 0; i < submissions.length; i++) {
+                    text += `<div class="submission_storage">Name: <b>${submissions[i]["student"]}</b> || Ratio of time not looking near camera: <b>${submissions[i]["gazeSuspicion"]}</b> || Neutrality (higher is more neutral): <b>${submissions[i]["polarity"]}</b><div class="hidable"><br/>${submissions[i]["questions"][0]}</div><div class="hidable"><br/><a href="/media/${submissions[i]["answers"][0]}" download="">Student Answer</a> - <a href="/media/${submissions[i]["processed"][0]}" download="">Student Answer (Computer Analysis)</a></div><div class="hidable"><br/>${submissions[i]["questions"][1]}</div><div class="hidable"><br/><a href="/media/${submissions[i]["answers"][1]}" download="">Student Answer</a> - <a href="/media/${submissions[i]["processed"][1]}" download="">Student Answer (Computer Analysis)</a></div><div class="hidable"><br/>${submissions[i]["questions"][2]}</div><div class="hidable"><br/><a href="/media/${submissions[i]["answers"][2]}" download="">Student Answer</a> - <a href="/media/${submissions[i]["processed"][2]}" download="">Student Answer (Computer Analysis)</a></div><div class="hidable"><br/>${submissions[i]["questions"][3]}</div><div class="hidable"><br/><a href="/media/${submissions[i]["answers"][3]}" download="">Student Answer</a> - <a href="/media/${submissions[i]["processed"][3]}" download="">Student Answer (Computer Analysis)</a></div><div class="hidable"><br/>${submissions[i]["questions"][4]}</div><div class="hidable"><br/><a href="/media/${submissions[i]["answers"][4]}" download="">Student Answer</a> - <a href="/media/${submissions[i]["processed"][4]}" download="">Student Answer (Computer Analysis)</a></div></div>`;
+                }
+                document.getElementById("content_row").innerHTML += text;
+                document.getElementById('course_selection').value = currentCourse;
+                document.getElementById('question_selection').value = currentQuestion;
+                var submissionElements = document.querySelectorAll('.submission_storage');
+                document.querySelectorAll('.hidable').forEach(function(element){
+                    element.style.display = 'none';
+                });
+                submissionElements.forEach(function (element) {
+                    element.addEventListener('click', function () {
+                        var subElements = this.querySelectorAll('.hidable');
+                        subElements.forEach(function (subElement) {
+                            subElement.style.display = (subElement.style.display === 'none' || subElement.style.display === '') ? 'block' : 'none';
+                        });
+                    });
+                });
+            });
+
+            return false;
+        }
+    </script>
+{% endblock %}

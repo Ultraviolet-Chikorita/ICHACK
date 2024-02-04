@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body %}
+    <div class="row" style="margin-bottom: 50px;">
+        <div class="menu_main">
+            <div class="menu_container">
+                <div onclick="window.location.href='/main/'" class="button_div hexagon main_menu_button">Home</div>
+                <div onclick="window.location.href='/main/about'" class="button_div hexagon main_menu_button menuSelected">About IntellInspect</div>
+                <div onclick="window.location.href='/main/login'" class="button_div hexagon main_menu_button">
+                    {% if user.is_authenticated %}
+                        Logout
+                    {% else %}
+                        Login
+                    {% endif %}
+                </div>
+                <div onclick="window.location.href='/main/team'" class="button_div hexagon main_menu_button">Our Team</div>
+                <div onclick="luckyShot();" class="button_div hexagon main_menu_button">I'm feeling Lucky</div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="remainingSpace">
+        <div class="row">
+            <h1>About</h1>
+        </div>
+        <div class="row">
+            <div id="content_row">
+                <h1>IntellInspect: Revolutionizing Online Assessments with Gaze Tracking Technology</h1>
+
+    <h2>Executive Summary:</h2>
+
+    <p>IntellInspect is an innovative solution designed to address the growing concern of academic dishonesty in online interviews and student coursework submissions. Leveraging advanced AI technologies, our project introduces a comprehensive approach to ensure the authenticity and integrity of students' work.</p>
+
+    <h2>Objective:</h2>
+
+    <ul>
+        <li>To create a secure and reliable platform for online interviews and coursework submissions.</li>
+        <li>To minimize cheating by implementing AI-generated questions, video responses, and gaze tracking technology.</li>
+        <li>To provide a seamless user experience with an easy-to-use interface.</li>
+    </ul>
+
+    <h2>Key Features:</h2>
+
+    <ol>
+        <li><strong>AI-Generated Questions:</strong>
+            <ul>
+                <li>Utilizing Chat GPT, we generate dynamic and challenging questions for students to explain their work.</li>
+                <li>Questions are presented one by one, ensuring a focused response and reducing the likelihood of cheating.</li>
+            </ul>
+        </li>
+        <li><strong>Video Responses:</strong>
+            <ul>
+                <li>Students respond to questions through video submissions, adding an extra layer of authenticity.</li>
+                <li>Arbitrary time limits, determined by question difficulty, discourage the use of external aids.</li>
+            </ul>
+        </li>
+        <li><strong>Gaze Tracking Technology:</strong>
+            <ul>
+                <li>Integration of an ML model for eye tracking to monitor pupil position during video responses.</li>
+                <li>Analysis of relative pupil position helps identify suspicious behavior, such as looking away or frequent distractions.</li>
+            </ul>
+        </li>
+        <li><strong>Sentiment Analysis:</strong>
+            <ul>
+                <li>Employing sentiment analysis to gauge the emotional state of the person being interviewed.</li>
+                <li>Provides additional insights into the student's engagement and sincerity.</li>
+            </ul>
+        </li>
+        <li><strong>Web-Based Interface:</strong>
+            <ul>
+                <li>User-friendly website allowing seamless interaction with the system.</li>
+                <li>Input an essay, receive AI-generated questions, and record video responses within the platform.</li>
+            </ul>
+        </li>
+        <li><strong>Secure Authentication:</strong>
+            <ul>
+                <li>Robust user authentication with salting and hashing for enhanced security.</li>
+                <li>Protects user accounts from unauthorized access and ensures data confidentiality.</li>
+            </ul>
+        </li>
+    </ol>
+
+    <h2>Benefits:</h2>
+
+    <ul>
+        <li><strong>Academic Integrity:</strong> Ensures that students stand behind their work, fostering a culture of academic honesty.</li>
+        <li><strong>Efficient Evaluation:</strong> Simplifies the assessment process for educators with automated analysis and insights.</li>
+        <li><strong>User-Friendly Interface:</strong> The intuitive website design facilitates easy navigation for both students and educators.</li>
+        <li><strong>Enhanced Security:</strong> Advanced authentication mechanisms safeguard user accounts and sensitive data.</li>
+    </ul>
+
+    <h2>Recommendations:</h2>
+
+    <ul>
+        <li>Collaborate with educational institutions to integrate IntellInspect into their online assessment processes.</li>
+        <li>Continuous improvement and updates to the AI models to adapt to evolving cheating techniques.</li>
+        <li>Provide training and support to educators for effective utilization of the platform.</li>
+    </ul>
+
+    <h2>Conclusion:</h2>
+
+    <p>IntellInspect represents a breakthrough in the fight against academic dishonesty, offering a comprehensive solution that goes beyond conventional assessment methods. By combining AI-generated questions, video responses, gaze tracking, and sentiment analysis, we provide a robust platform that promotes academic integrity in online environments. IntellInspect is poised to revolutionize the way online assessments are conducted, ensuring a fair and secure academic ecosystem.</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

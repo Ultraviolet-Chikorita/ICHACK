@@ -1,0 +1,229 @@
+body {
+    background-color: #1a1a1a;
+    font-family: "VT323", monospace;
+    font-weight: 1200;
+    font-style: normal;
+    color: white;
+}
+
+.button_div {
+    background-color: #8c8c8c;
+}
+
+.button_div:hover {
+    background-color: #bfbfbf;
+    cursor: pointer;
+}
+
+.hexagon {
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+
+.menu_main {
+    display: flex; 
+    --s: 150px;  
+    --m: 4px;   
+    --f: calc(var(--s) * 1.732 + 4 * var(--m) - 1px);
+    max-width: 480px;
+}
+
+.row {
+    width:100%;
+    justify-content: center;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.menu_container {
+    font-size: 0;
+}
+
+.menu_container::before {
+    content: "";
+    width: calc(var(--s) / 2 + var(--m));
+    float: left;
+    height: 120%; 
+    shape-outside: repeating-linear-gradient(#0000 0 calc(var(--f) - 3px), #000 0 var(--f));
+}
+
+.main_menu_button {
+    width: var(--s);
+    margin: var(--m);
+    height: calc(var(--s) * 1.1547);
+    text-align: center;
+    vertical-align: middle;
+    line-height: calc(var(--s) * 1.1547);
+    display: inline-block;
+    font-size:initial;
+    clip-path: polygon(0% 25%, 0% 75%, 50% 100%, 100% 75%, 100% 25%, 50% 0%);
+    margin-bottom: calc(var(--m) - var(--s) * 0.2885);
+    color: black;
+}
+
+.menuSelected:before, .menuSelected:after {
+    color:black;
+    font-weight: bold;
+	content: '';
+	position: absolute;
+	left: -2px;
+	top: -2px;
+	background: linear-gradient(45deg, #fb0094, #0000ff, #00ff00,#ffff00, #ff0000, #fb0094, 
+		#0000ff, #00ff00,#ffff00, #ff0000);
+	background-size: 400%;
+	width: calc(100% + 4px);
+	height: calc(100% + 4px);
+	z-index: -1;
+	animation: steam 20s linear infinite;
+}
+
+@keyframes steam {
+	0% {
+		background-position: 0 0;
+	}
+	50% {
+		background-position: 400% 0;
+	}
+	100% {
+		background-position: 0 0;
+	}
+}
+
+.menuSelected:after {
+	filter: blur(35px);
+}
+
+#content_row {
+    width:70%;
+    background-color: #0d0d0d; 
+    border-radius: 10px;
+    padding: 30px;
+    display: flex; 
+    flex-direction: column;
+    margin-bottom: 40px;
+}
+
+input[type=text] {
+    background-color: #000000;
+    border: none;
+    border-left: 1px solid white;
+    border-right: 1px solid white;
+    border-top: 1px dashed white;
+    border-bottom: 1px dashed white;
+    padding: 5px;
+    border-radius:3px;
+    width:90%;
+    color:white;
+}
+
+input[type=text]:focus {
+    border-bottom: medium solid #ffff00;
+    outline: none;
+    caret-color: #ffff00;
+}
+
+textarea {
+    background-color: #000000;
+    border: none;
+    border-left: 1px solid white;
+    border-right: 1px solid white;
+    border-top: 1px dashed white;
+    border-bottom: 1px dashed white;
+    padding: 5px;
+    border-radius:3px;
+    width:90%;
+    color:white;
+    height:auto;
+}
+
+textarea:focus {
+    border-bottom: medium solid #ffff00;
+    outline: none;
+    caret-color: #ffff00;
+}
+
+input[type=password] {
+    background-color: #000000;
+    border-left: 1px solid white;
+    border-right: 1px solid white;
+    border-top: 1px dashed white;
+    border-bottom: 1px dashed white;
+    padding: 5px;
+    border-radius:3px;
+    width:90%;
+    color:white;
+}
+
+input[type=password]:focus {
+    border-bottom: medium solid #ffff00;
+    outline: none;
+    caret-color: #ffff00;
+}
+
+select {
+    background-color: #000000;
+    border-left: 1px solid white;
+    border-right: 1px solid white;
+    border-top: 1px dashed white;
+    border-bottom: 1px dashed white;
+    padding: 5px;
+    border-radius:3px;
+    width:90%;
+    color:white;
+}
+
+select:focus {
+    outline: none;
+}
+
+input[type=submit] {
+    width:10%;
+    border-radius: 3px;
+    border: 1px solid #ffff00;
+    padding: 5px;
+    background-color: black;
+    color: white;
+    font-weight: bold;
+}
+
+input[type=submit]:hover {
+    animation: pulse 3s linear infinite;
+    cursor: pointer;
+}
+
+@keyframes pulse {
+    0% {
+        width:10%;
+    }
+    50% {
+        width:13%;
+    }
+    100% {
+        width: 10%;
+    }
+}
+
+.submission_storage {
+    width:100%;
+    margin-bottom:8px;
+    padding:5px;
+    background-color:#000000;
+    border-radius:5px;
+    border:1px dashed white;
+    transition: border 1.5s;
+    cursor: pointer;
+}
+
+.submission_storage:hover {
+    border: 1px solid #ffff00;
+}
+
+a {
+    color: #31ded2;
+    text-decoration: none;
+}
+
+a:visited{
+    color: #de7331;
+    text-decoration: none;
+}

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body %}
+    <div class="row" style="margin-bottom: 50px;">
+        <div class="menu_main">
+            <div class="menu_container">
+                <div onclick="window.location.href='/main/'" class="button_div hexagon main_menu_button">Home</div>
+                <div onclick="window.location.href='/main/about'" class="button_div hexagon main_menu_button">About IntellInspect</div>
+                <div onclick="window.location.href='/main/login'" class="button_div hexagon main_menu_button menuSelected">
+                    {% if user.is_authenticated %}
+                        Logout
+                    {% else %}
+                        Login
+                    {% endif %}
+                </div>
+                <div onclick="window.location.href='/main/team'" class="button_div hexagon main_menu_button">Our Team</div>
+                <div onclick="luckyShot();" class="button_div hexagon main_menu_button">I'm feeling Lucky</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <h1>LOGIN</h1>
+    </div>
+    <div class="row">
+        <div id="content_row">
+            <form action="/main/loginUser" method="post">
+                {% csrf_token %}
+                Username:
+                <br/><br/>
+                <input type="text" name="username"/>
+                <br/><br/>
+                Password:
+                <br/><br/>
+                <input type="password" name="password"/>
+                <br/><br/>
+                <input type="submit" value="Submit"/>
+            </form>
+        </div>
+    </div>
+{% endblock %}
