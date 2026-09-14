@@ -15,20 +15,20 @@ IntellInspect is a hackathon-era Django prototype exploring whether an essay-sub
 - MediaPipe/OpenCV gaze/head-pose estimation;
 - teacher/student Django pages for viewing the workflow and results.
 
-## Reviewer guide
+## Key components
 
 The maintained application lives under `ICHACK_0/ichacksite/`.
 
-| File | What it shows |
+| File | Responsibility |
 | --- | --- |
 | [`ICHACK_0/ichacksite/ichacksite2/models.py`](ICHACK_0/ichacksite/ichacksite2/models.py) | courses, users, tasks, essay submissions, follow-up questions and stored analysis fields |
 | [`ICHACK_0/ichacksite/ichacksite2/views.py`](ICHACK_0/ichacksite/ichacksite2/views.py) | transcription, emotion-model calls, gaze geometry, authentication and submission workflow |
-| [`ICHACK_0/ichacksite/ichacksite2/access.py`](ICHACK_0/ichacksite/ichacksite2/access.py) | authenticated/teacher API guards and CSRF boundary added in the later cleanup pass |
+| [`ICHACK_0/ichacksite/ichacksite2/access.py`](ICHACK_0/ichacksite/ichacksite2/access.py) | authenticated/teacher API guards and CSRF boundary |
 | [`ICHACK_0/ichacksite/ichacksite2/templates/`](ICHACK_0/ichacksite/ichacksite2/templates/) | teacher/student product surfaces |
 | [`ICHACK_0/ichacksite/ichacksite/settings.py`](ICHACK_0/ichacksite/ichacksite/settings.py) | Django configuration |
 | [`requirements.txt`](requirements.txt) | original ML/web dependency stack |
 
-The interesting engineering work is the integration of web workflow, video processing and multiple model signals. The project should **not** be interpreted as evidence that those signals are scientifically valid measures of competence.
+The project integrates a web workflow, video processing, transcription and multiple model-derived signals. Those signals should **not** be interpreted as scientifically validated measures of competence.
 
 ## Conceptual flow
 
@@ -80,7 +80,7 @@ requirements.txt
 
 ## Methodological limitations
 
-Several parts of the original prototype are useful demonstrations but would need major redesign before research or educational deployment:
+Several parts of the original prototype would need major redesign before research or educational deployment:
 
 - **Gaze is not intent.** Looking away from a screen can have many benign causes and is affected by camera geometry, disability, environment and task style.
 - **Emotion classifiers are not competence detectors.** Off-the-shelf text-emotion models do not establish uncertainty, dishonesty or authorship.
@@ -98,10 +98,10 @@ Several parts of the original prototype are useful demonstrations but would need
 - some exception handling and data validation are prototype-grade;
 - the original committed development database/runtime caches have been removed from the maintained source tree.
 
-## What I would improve now
+## Future work
 
-I would first remove any notion of an automatic “suspicion” score. Instead, I would make the system an **evidence viewer**: generate content-grounded oral follow-up questions, record answers with consent, show exact transcript/question evidence to the educator, and evaluate factual consistency using a transparent rubric. Technically, I would extract media/model processing into typed services, schema-validate model output, add deterministic fixtures and tests, and define a deletion/retention policy for uploaded media.
+A safer direction would remove any notion of an automatic “suspicion” score and make the system an **evidence viewer** instead: generate content-grounded oral follow-up questions, record answers with consent, show exact transcript/question evidence to the educator, and evaluate factual consistency using a transparent rubric. Technically, the next steps would be to extract media/model processing into typed services, schema-validate model output, add deterministic fixtures and tests, and define a deletion/retention policy for uploaded media.
 
-## Historical note
+## Historical context
 
-This repository is retained as an early hackathon prototype. It is not one of the primary coding samples in this account; newer repositories demonstrate more mature testing, provenance and evaluation practices.
+This repository preserves the hackathon implementation and its original data-model terminology so the development history remains understandable. The maintained branch adds access-control and configuration hardening without rewriting the prototype as though it had originally been designed for production use.
