@@ -23,6 +23,7 @@ The maintained application lives under `ICHACK_0/ichacksite/`.
 | --- | --- |
 | [`ICHACK_0/ichacksite/ichacksite2/models.py`](ICHACK_0/ichacksite/ichacksite2/models.py) | courses, users, tasks, essay submissions, follow-up questions and stored analysis fields |
 | [`ICHACK_0/ichacksite/ichacksite2/views.py`](ICHACK_0/ichacksite/ichacksite2/views.py) | transcription, emotion-model calls, gaze geometry, authentication and submission workflow |
+| [`ICHACK_0/ichacksite/ichacksite2/access.py`](ICHACK_0/ichacksite/ichacksite2/access.py) | authenticated/teacher API guards and CSRF boundary added in the later cleanup pass |
 | [`ICHACK_0/ichacksite/ichacksite2/templates/`](ICHACK_0/ichacksite/ichacksite2/templates/) | teacher/student product surfaces |
 | [`ICHACK_0/ichacksite/ichacksite/settings.py`](ICHACK_0/ichacksite/ichacksite/settings.py) | Django configuration |
 | [`requirements.txt`](requirements.txt) | original ML/web dependency stack |
@@ -68,6 +69,7 @@ ICHACK_0/ichacksite/
   manage.py
   ichacksite/          Django project settings/URLs
   ichacksite2/
+    access.py          authentication/role/CSRF wrappers
     models.py
     views.py
     templates/
@@ -89,7 +91,7 @@ Several parts of the original prototype are useful demonstrations but would need
 
 ## Engineering limitations
 
-- several JSON endpoints in the hackathon code are `csrf_exempt`;
+- the original view functions still contain hackathon-era `csrf_exempt` decorators, but the maintained URL surface now wraps routed JSON/submission endpoints in normal CSRF validation and authentication; teacher data endpoints additionally require a teacher or superuser role;
 - model, video-processing and HTTP concerns are concentrated in `views.py`;
 - the repository has effectively no automated behavioral test suite;
 - OpenCV UI/debug behavior is mixed into server-side processing;
@@ -98,7 +100,7 @@ Several parts of the original prototype are useful demonstrations but would need
 
 ## What I would improve now
 
-I would first remove any notion of an automatic “suspicion” score. Instead, I would make the system an **evidence viewer**: generate content-grounded oral follow-up questions, record answers with consent, show exact transcript/question evidence to the educator, and evaluate factual consistency using a transparent rubric. Technically, I would extract media/model processing into typed services, schema-validate model output, protect every mutation endpoint with normal Django CSRF/auth controls, add deterministic fixtures and tests, and define a deletion/retention policy for uploaded media.
+I would first remove any notion of an automatic “suspicion” score. Instead, I would make the system an **evidence viewer**: generate content-grounded oral follow-up questions, record answers with consent, show exact transcript/question evidence to the educator, and evaluate factual consistency using a transparent rubric. Technically, I would extract media/model processing into typed services, schema-validate model output, add deterministic fixtures and tests, and define a deletion/retention policy for uploaded media.
 
 ## Historical note
 
